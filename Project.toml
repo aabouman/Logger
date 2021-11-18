@@ -1,0 +1,4 @@
+[deps]
+GRUtils = "0337cf30-a0fd-11e9-31db-a79914c9d7ac"
+Mercury = "132e21b8-9b22-48e1-9f17-2c0f1280c909"
+ZMQ = "c2297ded-f4af-51ae-bb23-16f91089e4e1"
