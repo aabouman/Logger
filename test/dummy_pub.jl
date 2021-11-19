@@ -8,7 +8,10 @@ using StaticArrays
 using LinearAlgebra
 
 if !isdefined(@__MODULE__, :TestMsg)
-    include(joinpath(@__DIR__, "test_msg_pb.jl"))
+    include(joinpath(@__DIR__, "proto", "test_msg_pb.jl"))
+end
+if !isdefined(@__MODULE__, :MOTORS)
+    include(joinpath(@__DIR__, "proto", "motors_msg_pb.jl"))
 end
 
 mutable struct SimpleNode <: Hg.Node

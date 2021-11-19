@@ -1,4 +1,13 @@
+name = "MercuryTools"
+uuid = "15057aaa-9591-467b-8e1f-a0a30829c29a"
+authors = ["Alexander A Bouman <alex.bouman@gmail.com>"]
+version = "0.1.0"
+
 [deps]
-GRUtils = "0337cf30-a0fd-11e9-31db-a79914c9d7ac"
+Dates = "ade2ca70-3891-5945-98fb-dc099432e06a"
 Mercury = "132e21b8-9b22-48e1-9f17-2c0f1280c909"
+ProtoBuf = "3349acd9-ac6a-5e09-bcdb-63829b23a429"
+Serialization = "9e88b42a-f829-5b0c-bbe9-9e923198166b"
+Sockets = "6462fe0b-24de-5631-8697-dd941f90decc"
+TOML = "fa267f1f-6049-4f14-aa54-33bafae1ed76"
 ZMQ = "c2297ded-f4af-51ae-bb23-16f91089e4e1"
