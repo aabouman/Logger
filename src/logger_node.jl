@@ -1,10 +1,3 @@
-import Mercury as Hg
-import ZMQ
-using Sockets
-import Dates: now, format
-import Serialization: serialize, deserialize
-using TOML
-
 struct MercuryLoggerError <: Exception
     msg::String
 end
@@ -46,8 +39,6 @@ function Hg.compute(hg_log::MercuryLogger)
             end
         end
     end
-
-    Hg.publish.(loggerIO.pubs)
 end
 
 function add_log_topic(hg_log::MercuryLogger, addr::IPv4, port::Int, msg::Hg.MercuryMessage)
@@ -56,4 +47,51 @@ function add_log_topic(hg_log::MercuryLogger, addr::IPv4, port::Int, msg::Hg.Mer
     # Create a publisher
     sub = Hg.ZmqSubscriber(loggerIO.ctx, addr, port)
     Hg.add_subscriber!(loggerIO, msg, sub)
+end
+
+function start_logging(
+        topic_names::Vector{String},
+        topic_addrs::Vector{IPv4},
+        topic_ports::Vector{Int},
+        topic_msgs::Vector{Hg.MercuryMessage},
+        log_file_name::String,
+        zmq_ctx::ZMQ.Context,
+        rate::Real,
+    )
+    @assert length(topic_names) == length(topic_addrs) == length(topic_ports) == length(topic_msgs)
+    Base.Filesystem.splitext(log_file_name)[end] == ".hglog" || throw(MercuryLoggerError("Log file must have .hglog extension"))
+
+    hg_log = MercuryLogger(zmq_ctx, rate, log_file_name)
+
+    for (name, addr, port, msg) in zip(topic_names, topic_addrs, topic_ports, topic_msgs)
+        push!(hg_log.topic_names, name)
+        add_log_topic(hg_log, addr, port, msg)
+    end
+
+    Hg.launch(hg_log)
+
+    return hg_log
+end
+
+function start_logging(
+        toml_specifier::String,
+        log_file_name::String = joinpath(pwd(), "mercury_log_" * format(now(), "dd_mm_yyyy_HH:MM.hglog"));
+        zmq_ctx::ZMQ.Context = ZMQ.context(),
+        rate::Real = 100,
+    )
+
+    topic_names, topic_addrs, topic_ports, topic_msgs = parse_log_toml(toml_specifier)
+    # Must use invokelatest as we have imported the message ProtoBuf files inside parse_toml
+    node = Base.invokelatest(
+        start_logging,
+        topic_names,
+        topic_addrs,
+        topic_ports,
+        topic_msgs,
+        log_file_name,
+        zmq_ctx,
+        rate,
+    )
+
+    return node
 end

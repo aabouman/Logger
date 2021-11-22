@@ -1,0 +1,4 @@
+# Don't include Mercury log files
+*.hglog
+
+*.DS_Store

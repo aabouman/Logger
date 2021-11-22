@@ -56,6 +56,5 @@ end
 function launch_simple_node(; rate = 10)
     node = SimpleNode(ZMQ.context(), rate = rate)
     Hg.setupIO!(node, Hg.getIO(node))
-    task = @async Hg.launch(node)
-    node
+    Hg.launch(node)
 end
